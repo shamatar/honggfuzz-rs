@@ -45,32 +45,25 @@ fn main() {
         .expect("failed to run \"make -C honggfuzz honggfuzz libhfuzz/libhfuzz.so");
     assert!(status.success());
 
-    // // build honggfuzz command and hfuzz static library
-    // let status = Command::new(GNU_MAKE)
-    //     .args(&["-C", "honggfuzz", "honggfuzz", "libhfuzz/libhfuzz.a"])
-    //     .status()
-    //     .expect("failed to run \"make -C honggfuzz hongfuzz libhfuzz/libhfuzz.a\"");
-    // assert!(status.success());
-
-    // // copy hfuzz static library to output directory
-    // let status = Command::new("cp")
-    //     .args(&["honggfuzz/libhfuzz/libhfuzz.a", &out_dir])
-    //     .status()
-    //     .expect(&format!("failed to run \"cp honggfuzz/libhfuzz/libhfuzz.a {}\"", &out_dir));
-    // assert!(status.success());
-
     // build honggfuzz command and hfuzz static library
     let status = Command::new(GNU_MAKE)
-        .args(&["-C", "honggfuzz", "honggfuzz", "libhfuzz/libhfuzz.so"])
+        .args(&["-C", "honggfuzz", "honggfuzz", "libhfuzz/libhfuzz.a"])
         .status()
-        .expect("failed to run \"make -C honggfuzz hongfuzz libhfuzz/libhfuzz.so\"");
+        .expect("failed to run \"make -C honggfuzz hongfuzz libhfuzz/libhfuzz.a\"");
     assert!(status.success());
 
     // copy hfuzz static library to output directory
     let status = Command::new("cp")
-        .args(&["honggfuzz/libhfuzz/libhfuzz.so", &out_dir])
+        .args(&["honggfuzz/libhfuzz/libhfuzz.a", &out_dir])
         .status()
-        .expect(&format!("failed to run \"cp honggfuzz/libhfuzz/libhfuzz.so {}\"", &out_dir));
+        .expect(&format!("failed to run \"cp honggfuzz/libhfuzz/libhfuzz.a {}\"", &out_dir));
+    assert!(status.success());
+
+    // copy hfuzzcommon static library to output directory
+    let status = Command::new("cp")
+        .args(&["honggfuzz/libhfcommon/libhfcommon.a", &out_dir])
+        .status()
+        .expect(&format!("failed to run \"cp honggfuzz/libhfcommon/libhfcommon.a {}\"", &out_dir));
     assert!(status.success());
 
     // copy honggfuzz executable to honggfuzz target directory
@@ -81,7 +74,7 @@ fn main() {
     assert!(status.success());
 
     // tell cargo how to link final executable to hfuzz static library
-    // println!("cargo:rustc-link-lib=static={}", "hfuzz");
-    println!("cargo:rustc-link-lib=dylib={}", "hfuzz");
+    println!("cargo:rustc-link-lib=static={}", "hfuzz");
+    println!("cargo:rustc-link-lib=static={}", "hfcommon");
     println!("cargo:rustc-link-search=native={}", &out_dir);
 }
