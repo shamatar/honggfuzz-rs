@@ -37,6 +37,12 @@ fn main() {
         .expect("failed to run \"make -C honggfuzz clean\"");
     assert!(status.success());
     // TODO: maybe it's not a good idea to always clean the sources..
+    #[cfg(os = "macos")]
+    let status = Command::new(GNU_MAKE)
+        .args(&["-C", "honggfuzz", "mac/arch.o"])
+        .status()
+        .expect("failed to run \"make -C honggfuzz mac/arch.o on MacOS");
+    assert!(status.success());
 
     // build honggfuzz command and hfuzz static library
     let status = Command::new(GNU_MAKE)
